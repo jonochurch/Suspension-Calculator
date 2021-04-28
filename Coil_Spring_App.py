@@ -24,7 +24,7 @@ for file in glob.glob("Leverage Files/*_Shock Compression.txt"):
 
 
 
-frame = st.selectbox('Select Frame File', options=txtfiles)
+frame = st.sidebar.selectbox('Select Frame File', options=txtfiles)
 bike = {
     
         'Ratio' : np.array(pd.read_csv(f'{frame}', usecols=[2], delim_whitespace=' ')),
@@ -38,20 +38,24 @@ shock = bike['Shock'].reshape(-1,)
 ratio = 1/bike['Ratio'].reshape(-1,)
 pro = int((((ratio[0]/ratio[-1])-1)*100)) #calculate progression from beginning to end
 
-row1_spacer1, row1_1, row1_spacer2, row1_2, row1_spacer3 = st.beta_columns(
-    (.1, 3, 0.1, 4, .1))
+# row1_spacer1, row1_1, row1_spacer2, row1_2, row1_spacer3 = st.sidebar.beta_columns(
+#     (.1, 3, 0.1, 4, .1))
     
-with row1_1:    
-    riderweight=st.number_input('Riding Weight(kg)', value = 75) #kg
-    bikeweight=st.number_input('Bike Total Weight(kg)', value = 15) #kg
+# with row1_1:    
+riderweight=st.sidebar.number_input('Riding Weight(kg)', value = 75) #kg
+bikeweight=st.sidebar.number_input('Bike Total Weight(kg)', value = 15) #kg
+spring = st.sidebar.number_input('Spring Rate (lb/in)', value = 450)#lb/in
 
-with row1_2:
-    weightbalance=st.slider('Weight Distribution', min_value=0.0, max_value=1.0, value=0.6) #%of weight on rear wheel
-    rearweight = (riderweight + (bikeweight*0.8)) * weightbalance #rear sprung weight
-    travel = position[-1] #bike travel
-    stroke = shock[-1] #shock stroke
-    
-    spring = st.number_input('Spring Rate (lb/in)', value = 450)#lb/in
+# with row1_2:
+weightbalance=st.sidebar.slider('Weight Distribution', min_value=0.0, max_value=1.0, value=0.6) #%of weight on rear wheel
+rearweight = (riderweight + (bikeweight*0.8)) * weightbalance #rear sprung weight
+travel = position[-1] #bike travel
+stroke = shock[-1] #shock stroke
+lsc=st.sidebar.number_input('LSC damping rate')
+hsc=st.sidebar.number_input('HSC damping rate')
+
+lsr=st.sidebar.number_input('LSR damping rate')
+hsr=st.sidebar.number_input('HSR damping rate')
 
 
 
@@ -65,7 +69,7 @@ wheel = Force / ratio
 n =  (rearweight*9.81) #weight on wheel in N
 sag = np.round(np.interp(n, wheel, position),1)
 sagpc = np.round((sag/travel)*100, 1)               
-sagratio = np.round(np.interp(sag, position, ratio),1)
+sagratio = np.round(np.interp(sag, position, ratio),2) #leverage ratio at sag
 shockforce = n*sagratio
 sagforce=shockforce/mspring
 shocksagpc = np.round((sagforce/stroke)*100,1)
@@ -95,12 +99,20 @@ for x in filteredrate:
 def dampingrate(f, m, r):
     damping = 2 * r * f * m #natural freq in rad/s x weight x damping ratio
     return damping
-FF = np.round(np.interp(sag, filteredposition, Fn ),1)    
 
-dr = (0.1,0.2,0.4,0.5) #damping ratios
+FF = np.round(np.interp(sag, filteredposition, Fn ),2)  #Natural frequency @ sag  
 
-row1_spacer1, row1_1, row1_spacer2, row1_2, row1_spacer3 = st.beta_columns(
-    (.1, 3, 0.1, 3, .1)
+Dc = dampingrate((FF*6.28), rearweight, 1) #Critical wheel damping rate
+
+Dcs = Dc*(sagratio**2)
+lcdr= np.round(((lsc/(sagratio**2))/Dc),2)
+
+dr = (0.1,0.2,0.3,0.4,0.5) #damping ratios
+
+row1_1, row1_2, row1_3 = st.beta_columns(
+    (2, 2, 2,)
+#row1_spacer1, row1_1, row1_spacer2, row1_2, row1_spacer3, row1_3, row1_spacer4 = st.beta_columns(
+ #   (.1, 2, 0.05, 2, .05, 2, .1)
     )
 with row1_1:
     st.text(f'Sag @ rear wheel = {sagpc}%')#sag at the wheel
@@ -113,10 +125,18 @@ with row1_1:
     proscore=np.mean(ratechange) * 1000
     st.text(f'Progression Score = {int(proscore)}')
     st.text(f'Progression = {pro}%')
+    
+with row1_2:
     st.text(f'Mid Stroke Score = {int(midstroke_score)}')
     st.text(f'Natural Frequency @ Sag ={FF}')
+    st.text(f'Wheel Critical Damping Rate @ Sag = {int(Dc)}')
+    st.text(f'Shock Critical Damping Rate @ Sag = {int(Dcs)}')
+    st.text(f'LSC Damping Ratio = {lcdr}')
+    st.text(f'HSC Damping Ratio = {np.round(hsc/Dcs,2)}')
+    st.text(f'LSR Damping Ratio = {np.round(lsr/Dcs,2)}')
+    st.text(f'HSR Damping Ratio = {np.round(hsr/Dcs,2)}')
 
-with row1_2:
+with row1_3:
 
     fig1 = Figure()
     ax = fig1.subplots()
@@ -134,10 +154,10 @@ with row1_2:
 
 
 
-row1_spacer1, row1_1, row1_spacer2, row1_2, row1_spacer3 = st.beta_columns(
+row2_spacer1, row2_1, row2_spacer2, row2_2, row2_spacer3 = st.beta_columns(
     (.1, 3, 0.1, 3, .1)
     )
-with row1_1:
+with row2_1:
 
 
 
@@ -156,7 +176,7 @@ with row1_1:
 
 
 
-with row1_2:
+with row2_2:
 
 
     fig3 = Figure()
@@ -259,25 +279,7 @@ with row1_2:
     st.pyplot(fig7)
    
 
-
-
-    for dampingratio in dr:
-        damprate=[]
-        for f in freq:
-            rate = dampingrate(f, rearweight, dampingratio)
-            damprate.append(rate) # in N/m/s
-        shockdampingrate = damprate*(ratio[1:]**2) #N/m/s
-        plt.plot(shock[1:], shockdampingrate, label =f'Damping Ratio = {dampingratio}')
-        plt.title("Shock Damping Rate", fontname='Heavitas')
-        plt.ylabel("Damping Rate (N/m/s)")
-        plt.xlabel('Position')
-        plt.legend()
-        plt.gca().spines['top'].set_visible(False)
-        plt.gca().spines['right'].set_visible(False)
-        plt.grid(True)
-        plt.xscale('linear')
-        plt.axvline(x=shocksag, ls='--')
-    plt.show()
+    
 
 
 
