@@ -5,26 +5,3 @@ secondaryBackgroundColor="#37a3b2"
 textColor="#fafafa"
 font="sans serif"
 
-
-# List of folders that should not be watched for changes. This impacts both "Run on Save" and @st.cache.
-# Relative paths will be taken as relative to the current working directory.
-# Example: ['/home/user1/env', 'relative/path/to/folder']
-# Default: []
-folderWatchBlacklist = []
-
-# Change the type of file watcher used by Streamlit, or turn it off completely.
-# Allowed values: * "auto" : Streamlit will attempt to use the watchdog module, and falls back to polling if watchdog is not available. * "watchdog" : Force Streamlit to use the watchdog module. * "poll" : Force Streamlit to always use polling. * "none" : Streamlit will not watch files.
-# Default: "auto"
-fileWatcherType = "auto"
-
-# Symmetric key used to produce signed cookies. If deploying on multiple replicas, this should be set to the same value across all replicas to ensure they all share the same secret.
-# Default: randomly generated secret key.
-cookieSecret = "f8b7582082c5a4903916139e55a911170246459cdd73190983f806b7fc81623e"
-
-# If false, will attempt to open a browser window on start.
-# Default: false unless (1) we are on a Linux box where DISPLAY is unset, or (2) server.liveSave is set.
-headless = false
-
-# Automatically rerun script when the file is modified on disk.
-# Default: false
-runOnSave = true
