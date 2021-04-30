@@ -32,7 +32,7 @@ bike = {
         'Position' : np.array(pd.read_csv(f'{frame}', usecols=[0], delim_whitespace=' ')),
         'Shock' : np.array(pd.read_csv(f'{frame}', usecols=[1], delim_whitespace=' '))
         }
-name=frame[8:-22]    
+name=frame[:-22]    
 
 position = bike['Position'].reshape(-1,)
 shock = bike['Shock'].reshape(-1,)
