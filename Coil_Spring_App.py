@@ -19,7 +19,7 @@ import glob
 # import matplotlib
 # matplotlib.use( 'tkagg' )
 txtfiles = []
-for file in glob.glob("CoilApp/*_Shock Compression.txt"):
+for file in glob.glob("*_Shock Compression.txt"):
     txtfiles.append(file)
 
 st.set_page_config(layout="wide")
@@ -116,7 +116,7 @@ row1_1, row1_2, row1_3 = st.beta_columns(
  #   (.1, 2, 0.05, 2, .05, 2, .1)
     )
 with row1_1:
-    st.image('CoilApp/TheSuspensionLab01_Turqoise_RGB-01.jpg')
+    st.image('TheSuspensionLab01_Turqoise_RGB-01.jpg')
     st.title("Suspension Analysis")
     st.header(f'{name}')
     fig2 = Figure()
