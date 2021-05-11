@@ -108,7 +108,7 @@ Dc = dampingrate((FF*6.28), rearweight, 1) #Critical wheel damping rate
 Dcs = Dc*(sagratio**2)
 lcdr= np.round(((lsc/(sagratio**2))/Dc),2)
 
-dr = (0.07, 0.1,0.2,0.3,0.4,0.5) #damping ratios
+dr = (0.07, 0.11,0.2,0.3,0.4,0.5) #damping ratios
 
 row1_1, row1_2, row1_3 = st.beta_columns(
     (2, 2, 2)
